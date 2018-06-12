@@ -3,11 +3,16 @@ arch_arania_negra = open('La araña negra - tomo 1.txt', encoding="ISO-8859-1")
 # arch_settings = open('configuracion.txt','rb')
 arch_1000_noches_y_1_noche = open('Las 1000 Noches y 1 Noche.txt', encoding="ISO-8859-1")
 arch_palabras = open('palabras.txt', 'w+')
+palabras_validas_cuentos = open('palabras_texto_cuentos.txt', 'w+')
+palabras_validas_arania_negra = open('palabras_texto_arania_negra.txt', 'w+')
+palabras_validas_1000_noches_y_1_noche = open('palabras_texto_1000_noches_y_1_noche.txt', 'w+')
+
 
 linea_arch_cuentos = arch_cuentos.readline()
 linea_arch_arania_negra = arch_arania_negra.readline()
 # linea_arch_settings = arch_settings.readline()
 linea_arch_1000_noches_y_1_noche = arch_1000_noches_y_1_noche.readline()
+
 
 
 def leer_archivo(archivo):
@@ -63,8 +68,16 @@ def contar_palabras(lista):
                     diccionario[palabra] = 1
     return diccionario
 
-lista = leer_archivo(arch_cuentos)
-print(contar_palabras(lista))
+
+lista_de_palabras_cuentos = leer_archivo(arch_cuentos)
+lista_de_palabras_1000_noches_y_1_noche = leer_archivo(arch_1000_noches_y_1_noche)
+lista_de_palabras_arania_negra = leer_archivo(arch_arania_negra)
+diccionario_cuentos = contar_palabras(lista_de_palabras_cuentos)
+palabras_cuentos = diccionario_cuentos.items()
+#apariciones_palabras_cuentos = diccionario_cuentos.values()
+for palabra in palabras_cuentos:
+    palabras_validas_1000_noches_y_1_noche.write(palabra[0]+", "+str(palabra[1])+"\n")
+print("Datos guardados exitosamente!")
 
 
 arch_cuentos.close()
