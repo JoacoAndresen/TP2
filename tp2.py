@@ -1,25 +1,21 @@
 arch_cuentos = open('Cuentos.txt', encoding="ISO-8859-1")
 arch_arania_negra = open('La araña negra - tomo 1.txt', encoding="ISO-8859-1")
-# arch_settings = open('configuracion.txt','rb')
 arch_1000_noches_y_1_noche = open('Las 1000 Noches y 1 Noche.txt', encoding="ISO-8859-1")
 arch_palabras = open('palabras.txt', 'w+')
-
-linea_arch_cuentos = arch_cuentos.readline()
-linea_arch_arania_negra = arch_arania_negra.readline()
-# linea_arch_settings = arch_settings.readline()
-linea_arch_1000_noches_y_1_noche = arch_1000_noches_y_1_noche.readline()
+palabras_validas_cuentos = open('palabras_texto_cuentos.txt', 'w+')
+palabras_validas_arania_negra = open('palabras_texto_arania_negra.txt', 'w+')
+palabras_validas_1000_noches_y_1_noche = open('palabras_texto_1000_noches_y_1_noche.txt', 'w+')
 
 
 def leer_archivo(archivo):
     linea = archivo.readline()
     lista = []
     while linea:
-        #print(linea)
-        linea = archivo.readline()
         if len(linea) > 1:
             listaPalabras = pasarTextoALista(linea)
             for palabra in listaPalabras:
                 lista.append(palabra)
+        linea = archivo.readline()
     lista.sort()
     return lista
 
@@ -63,12 +59,22 @@ def contar_palabras(lista):
                     diccionario[palabra] = 1
     return diccionario
 
-lista = leer_archivo(arch_cuentos)
-print(contar_palabras(lista))
+
+def escribirArchivos(archivo_leer, archivo_escribir):
+    """Programada por Joaquín Andresen.
+    Recibe dos archivos, lee archivo_leer y crea un diccionario con sus palabras, luego procede a escribir el contenido
+    del diccionario en archivo_escribir."""
+    lista_de_palabras = leer_archivo(archivo_leer)
+    diccionario_de_palabras = contar_palabras(lista_de_palabras)
+    for palabra in diccionario_de_palabras.items():
+        archivo_escribir.write((palabra[0]+", "+str(palabra[1])+"\n").encode('ascii', 'ignore').decode('ascii'))
+    print("Datos guardados exitosamente!")
 
 
 arch_cuentos.close()
 arch_arania_negra.close()
-# arch_settings.close()
 arch_1000_noches_y_1_noche.close()
 arch_palabras.close()
+palabras_validas_1000_noches_y_1_noche.close()
+palabras_validas_cuentos.close()
+palabras_validas_arania_negra.close()
