@@ -59,17 +59,21 @@ def contar_palabras(lista):
                     diccionario[palabra] = 1
     return diccionario
 
-
 def escribirArchivos(archivo_leer, archivo_escribir):
     """Programada por Joaquín Andresen.
     Recibe dos archivos, lee archivo_leer y crea un diccionario con sus palabras, luego procede a escribir el contenido
     del diccionario en archivo_escribir."""
     lista_de_palabras = leer_archivo(archivo_leer)
     diccionario_de_palabras = contar_palabras(lista_de_palabras)
-    for palabra in diccionario_de_palabras.items():
+    for palabra in sorted(diccionario_de_palabras.items(), key=lambda x: x[0]):
         archivo_escribir.write((palabra[0]+", "+str(palabra[1])+"\n").encode('ascii', 'ignore').decode('ascii'))
     print("Datos guardados exitosamente!")
 
+escribirArchivos(arch_cuentos, palabras_validas_cuentos)
+
+print(leer_archivo(palabras_validas_cuentos)) # Hay que reseetear el archivo a la primera linea
+
+"""Agregar una funcion que detecte el sistema operativo"""
 
 arch_cuentos.close()
 arch_arania_negra.close()
