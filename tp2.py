@@ -1,3 +1,5 @@
+import platform
+
 arch_cuentos = open('Cuentos.txt', encoding="ISO-8859-1")
 arch_arania_negra = open('La araña negra - tomo 1.txt', encoding="ISO-8859-1")
 arch_1000_noches_y_1_noche = open('Las 1000 Noches y 1 Noche.txt', encoding="ISO-8859-1")
@@ -6,6 +8,9 @@ palabras_validas_cuentos = open('palabras_texto_cuentos.txt', 'w+')
 palabras_validas_arania_negra = open('palabras_texto_arania_negra.txt', 'w+')
 palabras_validas_1000_noches_y_1_noche = open('palabras_texto_1000_noches_y_1_noche.txt', 'w+')
 
+
+def sistemaOperativo():
+    return platform.system()
 
 def leer_archivo(archivo):
     linea = archivo.readline()
@@ -65,12 +70,13 @@ def escribirArchivos(archivo_leer, archivo_escribir):
     lista_de_palabras = leer_archivo(archivo_leer)
     diccionario_de_palabras = contar_palabras(lista_de_palabras)
     for palabra in sorted(diccionario_de_palabras.items(), key=lambda x: x[0]):
-        archivo_escribir.write((palabra[0]+"\n").encode('ascii', 'ignore').decode('ascii'))
+        if sistemaOperativo() == "Windows":
+            archivo_escribir.write(palabra[0]+"\n")
+        else:
+            archivo_escribir.write((palabra[0]+"\n").encode('ascii', 'ignore').decode('ascii'))
     print("Datos guardados exitosamente!")
     archivo_leer.seek(0)
     archivo_escribir.seek(0)
-
-"""Agregar una funcion que detecte el sistema operativo"""
 
 arch_cuentos.close()
 arch_arania_negra.close()
