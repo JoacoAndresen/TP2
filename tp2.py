@@ -7,6 +7,7 @@ arch_palabras = open('palabras.txt', 'w+')
 palabras_validas_cuentos = open('palabras_texto_cuentos.txt', 'w+')
 palabras_validas_arania_negra = open('palabras_texto_arania_negra.txt', 'w+')
 palabras_validas_1000_noches_y_1_noche = open('palabras_texto_1000_noches_y_1_noche.txt', 'w+')
+caracteres_reemplazar = open('reemplazar.txt', encoding="ISO-8859-1")
 
 
 def sistemaOperativo():
@@ -47,12 +48,7 @@ def contar_palabras(lista):
         palabras = renglon.split()
         for palabra in palabras:
             palabra = palabra.lower()
-            palabra = palabra.replace("á", "a")
-            palabra = palabra.replace("é", "e")
-            palabra = palabra.replace("í", "i")
-            palabra = palabra.replace("ó", "o")
-            palabra = palabra.replace("ú", "u")
-            palabra = palabra.replace("ü", "u")
+            reemplazar(palabra)
             palabra = palabra.upper()
             caract = es_texto_valido(palabra)
             num = any(caract == False for letra in palabra)
@@ -78,6 +74,17 @@ def escribirArchivos(archivo_leer, archivo_escribir):
     archivo_leer.seek(0)
     archivo_escribir.seek(0)
 
+def reemplazar(palabra):
+    linea = caracteres_reemplazar.readline()
+    while linea:
+        caracteres = linea.strip().split(",")
+        palabra = palabra.replace(caracteres[0], caracteres[1])
+        linea = caracteres_reemplazar.readline()
+    return palabra
+
+
+
+
 arch_cuentos.close()
 arch_arania_negra.close()
 arch_1000_noches_y_1_noche.close()
@@ -85,3 +92,4 @@ arch_palabras.close()
 palabras_validas_1000_noches_y_1_noche.close()
 palabras_validas_cuentos.close()
 palabras_validas_arania_negra.close()
+caracteres_reemplazar.close()
