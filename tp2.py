@@ -16,7 +16,6 @@ def leer_archivo(archivo):
             for palabra in listaPalabras:
                 lista.append(palabra)
         linea = archivo.readline()
-    lista.sort()
     return lista
 
 
@@ -66,12 +65,10 @@ def escribirArchivos(archivo_leer, archivo_escribir):
     lista_de_palabras = leer_archivo(archivo_leer)
     diccionario_de_palabras = contar_palabras(lista_de_palabras)
     for palabra in sorted(diccionario_de_palabras.items(), key=lambda x: x[0]):
-        archivo_escribir.write((palabra[0]+", "+str(palabra[1])+"\n").encode('ascii', 'ignore').decode('ascii'))
+        archivo_escribir.write((palabra[0]+"\n").encode('ascii', 'ignore').decode('ascii'))
     print("Datos guardados exitosamente!")
-
-escribirArchivos(arch_cuentos, palabras_validas_cuentos)
-
-print(leer_archivo(palabras_validas_cuentos)) # Hay que reseetear el archivo a la primera linea
+    archivo_leer.seek(0)
+    archivo_escribir.seek(0)
 
 """Agregar una funcion que detecte el sistema operativo"""
 
