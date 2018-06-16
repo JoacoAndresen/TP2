@@ -11,6 +11,8 @@ caracteres_reemplazar = open('reemplazar.txt', encoding="ISO-8859-1")
 
 
 def sistemaOperativo():
+    """Programada por Joaquín Andresen.
+    Detecta el sistema operativo del usuario"""
     return platform.system()
 
 def leer_archivo(archivo):
@@ -59,7 +61,6 @@ def contar_palabras(lista):
                     diccionario[palabra] = 1
     return diccionario
 
-
 def escribirArchivos(archivo_leer, archivo_escribir):
     """Programada por Joaquín Andresen.
     Recibe dos archivos, lee archivo_leer y crea un diccionario con sus palabras, luego procede a escribir el contenido
@@ -75,7 +76,6 @@ def escribirArchivos(archivo_leer, archivo_escribir):
     archivo_leer.seek(0)
     archivo_escribir.seek(0)
 
-
 def reemplazar(palabra):
     linea = caracteres_reemplazar.readline()
     while linea:
@@ -85,16 +85,14 @@ def reemplazar(palabra):
     return palabra
 
 
-escribirArchivos(arch_cuentos, palabras_validas_cuentos)
-escribirArchivos(arch_arania_negra, palabras_validas_arania_negra)
-escribirArchivos(arch_1000_noches_y_1_noche, palabras_validas_1000_noches_y_1_noche)
-
-
 def leerLineaALinea(archivo, default):
     linea = archivo.readline()
     # print(linea)
     return linea if linea else default
 
+escribirArchivos(arch_cuentos, palabras_validas_cuentos)
+escribirArchivos(arch_arania_negra, palabras_validas_arania_negra)
+escribirArchivos(arch_1000_noches_y_1_noche, palabras_validas_1000_noches_y_1_noche)
 
 linea1 = leerLineaALinea(palabras_validas_cuentos, "zzz")
 linea2 = leerLineaALinea(palabras_validas_1000_noches_y_1_noche, "zzz")
