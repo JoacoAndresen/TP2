@@ -10,6 +10,7 @@ palabras_validas_cuentos = open('palabras_texto_cuentos.txt', 'w+')
 palabras_validas_arania_negra = open('palabras_texto_arania_negra.txt', 'w+')
 palabras_validas_1000_noches_y_1_noche = open('palabras_texto_1000_noches_y_1_noche.txt', 'w+')
 caracteres_reemplazar = open('reemplazar.txt', encoding="ISO-8859-1")
+arch_config = open('configuracion.txt', encoding="ISO-8859-1")
 
 def sistemaOperativo():
     """Programada por Joaquín Andresen.
@@ -44,7 +45,7 @@ def es_texto_valido(palabra):
     return True
 
 
-def contar_palabras(lista):
+def contar_palabras(lista, configuracion):
     """ Devuelve un diccionario formado por todas las palabras validas del texto y su cantidad de repeticiones. """
     diccionario = {}
     for renglon in lista:
@@ -55,19 +56,19 @@ def contar_palabras(lista):
             palabra = palabra.upper()
             caract = es_texto_valido(palabra)
             num = any(caract == False for letra in palabra)
-            if num is False and len(palabra) >= 5:
+            if num is False and len(palabra) >= int(configuracion[1][1]):
                 if palabra in diccionario:
                     diccionario[palabra] += 1
                 else:
                     diccionario[palabra] = 1
     return diccionario
 
-def escribirArchivos(archivo_leer, archivo_escribir):
+def escribirArchivos(archivo_leer, archivo_escribir, configuracion):
     """Programada por Joaquín Andresen.
     Recibe dos archivos, lee archivo_leer y crea un diccionario con sus palabras, luego procede a escribir el contenido
     del diccionario en archivo_escribir."""
     lista_de_palabras = leer_archivo(archivo_leer)
-    diccionario_de_palabras = contar_palabras(lista_de_palabras)
+    diccionario_de_palabras = contar_palabras(lista_de_palabras, configuracion)
     for palabra in sorted(diccionario_de_palabras.items(), key=lambda x: x[0]):
         if sistemaOperativo() == "Windows":
             archivo_escribir.write(palabra[0]+"\n")
@@ -141,29 +142,29 @@ def total_palabras(archivo_palabras):
         print("Hay " + str(item[1]) + " palabras de longitud: " + item[0])
         time.sleep(0.5)
 
-def cantidad_jugadores():
+def cantidad_jugadores(configuracion):
     """Programada por Fernando Fabbiano.
     Solicita la cantidad de jugadores, y en el caso de que la respuesta no sea un entero,
     vuelve a pedir la cantidad"""
     cantidad = input("\nIngresar la cantidad de jugadores: ")
-    while not cantidad.isdigit() or int(cantidad) > 10:
+    while not cantidad.isdigit() or int(cantidad) > int(configuracion[0][1]) or int(cantidad) < 0:
         cantidad = input("Error, ingrese una cantidad de jugadores menor o igual a 10: ")
     return int(cantidad)
 
-def solicitar_nombres():
+def solicitar_nombres(configuracion):
     """Programada por Fernando Fabbiano.
     Pide una cierta cantidad de nombres, basandose en la cantidad otorgada por la funcion cantidad_jugadores"""
     jugadores = []
-    cantidad = cantidad_jugadores()
+    cantidad = cantidad_jugadores(configuracion)
     for numero in range(1, cantidad+1):
         nombre = input("Ingrese el nombre del jugador "+str(numero)+": ").upper()
         jugadores.append(nombre)
     return jugadores
 
-def random_jugadores():
+def random_jugadores(configuracion):
     """Programada por Joaquín Andresen.
     Toma la lista de jugadores y la devuelve mezclada"""
-    jugadores = solicitar_nombres()
+    jugadores = solicitar_nombres(configuracion)
     random.shuffle(jugadores)
     return jugadores
 
@@ -207,7 +208,16 @@ def mensaje_de_turno(datos, jugador):
           "Desaciertos: " + str(datos[jugador][1]), "Puntos: " + str(datos[jugador][4]),
           "Letras utilizadas: " + str(datos[jugador][7]), "\n")
 
-def ahorcado(jugadores, datos):
+def leer_configuracion():
+    linea = arch_config.readline()
+    configuracion = []
+    while linea:
+        linea = linea.strip().split()
+        configuracion.append(linea)
+        linea = arch_config.readline()
+    return configuracion
+
+def ahorcado(jugadores, datos, configuracion):
     """Programada por todos.
     Sistema de turnos, hace que cada jugador juegue hasta que se equivoque para pasar al siguiente,
     asi sucesivamente hasta que algun jugador adivine la palabra o todos superen el limite de desaciertos"""
@@ -226,7 +236,7 @@ def ahorcado(jugadores, datos):
         datos1[jugador][8] = 0
         for y in datos1[jugador][5]:
             datos1[jugador][6].append("_")
-    while contador/len(jugadores) != 8:
+    while contador/len(jugadores) != (int(configuracion[2][1])+1):
         for jugador in jugadores:
             if datos1[jugador][8] < 8:
                 mensaje_de_turno(datos1, jugador)
@@ -236,14 +246,14 @@ def ahorcado(jugadores, datos):
                 if letra not in datos1[jugador][7]:
                     datos1[jugador][7].append(letra)
                 while letra in list(datos1[jugador][5]) and "_" in datos1[jugador][6]:
-                    datos1[jugador][4] += 1
+                    datos1[jugador][4] += int(configuracion[3][1])
                     for z in range(len(datos1[jugador][5])):
                         if letra == datos1[jugador][5][z]:
                             datos1[jugador][6][z] = letra
                     if "_" not in datos1[jugador][6]:
                         print("\n", "Felicidades " + jugador + ", has ganado!", "\n")
                         ganador = jugador
-                        datos1[jugador][4] += 30
+                        datos1[jugador][4] += int(configuracion[5][1])
                         return datos1, ganador
                     if letra in list(datos1[jugador][5]):
                         datos1[jugador][0] += 1
@@ -254,7 +264,7 @@ def ahorcado(jugadores, datos):
                     contador += 1
                     if letra not in datos1[jugador][7]:
                         datos1[jugador][7].append(letra)
-                datos1[jugador][4] -= 2
+                datos1[jugador][4] -= int(configuracion[3][1])
                 datos1[jugador][1] += 1
                 datos1[jugador][3] += 1
     print("\n", "Ha ganado el programa", "\n")
@@ -279,14 +289,15 @@ def main():
     time.sleep(1.0)
     print("v2.0\n")
     time.sleep(1.0)
-    escribirArchivos(arch_cuentos, palabras_validas_cuentos)
-    escribirArchivos(arch_arania_negra, palabras_validas_arania_negra)
-    escribirArchivos(arch_1000_noches_y_1_noche, palabras_validas_1000_noches_y_1_noche)
+    configuracion = leer_configuracion()
+    escribirArchivos(arch_cuentos, palabras_validas_cuentos, configuracion)
+    escribirArchivos(arch_arania_negra, palabras_validas_arania_negra, configuracion)
+    escribirArchivos(arch_1000_noches_y_1_noche, palabras_validas_1000_noches_y_1_noche, configuracion)
     merge(palabras_validas_cuentos, palabras_validas_arania_negra, palabras_validas_1000_noches_y_1_noche,
           arch_palabras)
     total_palabras(arch_palabras)
     time.sleep(1.0)
-    jugadores = random_jugadores()
+    jugadores = random_jugadores(configuracion)
     seguir = 1
     valido = [0, 1]
     datos = {}
@@ -295,7 +306,7 @@ def main():
         datos[jugador] = [0, 0, 0, 0, 0, "", [], [], 0]
     while seguir:
         partidas_jugadas += 1
-        datos, ganador = ahorcado(jugadores, datos)
+        datos, ganador = ahorcado(jugadores, datos, configuracion)
         print("Resultados Generales:")
         for jugador in jugadores:
             print("Datos de " + jugador, "\n", "Palabra: " + datos[jugador][5], "\n", "Puntaje: " + str(datos[jugador][4]),
@@ -328,3 +339,4 @@ palabras_validas_1000_noches_y_1_noche.close()
 palabras_validas_cuentos.close()
 palabras_validas_arania_negra.close()
 caracteres_reemplazar.close()
+arch_config.close()
