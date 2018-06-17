@@ -125,14 +125,15 @@ def total_palabras(archivo_palabras):
     cantidad_por_len = {}
     total = 0
     while linea:
+        total += 1
         palabra = linea.strip()
         len_palabra = len(palabra)
         if str(len_palabra) not in cantidad_por_len:
-            cantidad_por_len[str(len_palabra)] = len_palabra
+            cantidad_por_len[str(len_palabra)] = 1
         else:
-            cantidad_por_len[str(len_palabra)] += len_palabra
-        total += 1
+            cantidad_por_len[str(len_palabra)] += 1
         linea = archivo_palabras.readline()
+    print("Hay " + str(total) + " palabras en total")
     for item in sorted(cantidad_por_len.items(), key=lambda x: int(x[0])):
         print("Hay " + str(item[1]) + " palabras de longitud: " + item[0])
 
