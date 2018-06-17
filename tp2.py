@@ -11,6 +11,7 @@ palabras_validas_arania_negra = open('palabras_texto_arania_negra.txt', 'w+')
 palabras_validas_1000_noches_y_1_noche = open('palabras_texto_1000_noches_y_1_noche.txt', 'w+')
 caracteres_reemplazar = open('reemplazar.txt', encoding="ISO-8859-1")
 arch_config = open('configuracion.txt', encoding="ISO-8859-1")
+arch_partida = open('partida.txt', 'w+')
 
 def sistemaOperativo():
     """Programada por Joaquín Andresen.
@@ -217,6 +218,12 @@ def leer_configuracion():
         linea = arch_config.readline()
     return configuracion
 
+def archivo_partida(datos):
+    if sistemaOperativo() == "Windows":
+        arch_partida.write(datos[0] + ", ACIERTOS" + str(datos[1][2]) + ", DESACIERTOS " + str(datos[1][3]) + ", PUNTOS " + str(datos[1][4]) + ", PALABRAS " + str(datos[1][9]))
+    else:
+        arch_partida.write((datos[0] + ", ACIERTOS " + str(datos[1][2]) + ", DESACIERTOS " + str(datos[1][3]) + ", PUNTOS " + str(datos[1][4]) + ", PALABRAS " + str(datos[1][9])).encode('ascii', 'ignore').decode('ascii'))
+
 def ahorcado(jugadores, datos, configuracion):
     """Programada por todos.
     Sistema de turnos, hace que cada jugador juegue hasta que se equivoque para pasar al siguiente,
@@ -234,6 +241,7 @@ def ahorcado(jugadores, datos, configuracion):
         datos1[jugador][5] = random_palabra(longitud)
         datos1[jugador][6] = []
         datos1[jugador][8] = 0
+        datos1[jugador][9].append(datos1[jugador][5])
         for y in datos1[jugador][5]:
             datos1[jugador][6].append("_")
     while contador/len(jugadores) != (int(configuracion[2][1])+1):
@@ -276,7 +284,8 @@ def main():
     Funcion principal que junta todos los datos obtenidos y corre el juego. datos[0] son los aciertos de la partida,
     datos[1] son los desaciertos, datos[2] son los aciertos totales, datos[3] son los desaciertos totales,
     datos[4] son los puntos, datos[5] es la palabra a divinar, datos[6] es la palabra a davinar con los guiones bajos,
-    datos[7] son las letras utilizadas, datos[8] es el contador de turnos de el jugador. """
+    datos[7] son las letras utilizadas, datos[8] es el contador de turnos de el jugador, datos[9] es una lista que
+    contiene las palabras de cada jugador. """
     print("Bienvenidos al Ahorcado, desarrollado por: ")
     time.sleep(1.0)
     print(''' 
@@ -303,7 +312,7 @@ def main():
     datos = {}
     partidas_jugadas = 0
     for jugador in jugadores:
-        datos[jugador] = [0, 0, 0, 0, 0, "", [], [], 0]
+        datos[jugador] = [0, 0, 0, 0, 0, "", [], [], 0, []]
     while seguir:
         partidas_jugadas += 1
         datos, ganador = ahorcado(jugadores, datos, configuracion)
@@ -327,6 +336,8 @@ def main():
             seguir = input("Error, ingrese 1 para continuar y 0 para finalizar la partida: ")
         seguir = int(seguir)
         arch_palabras.seek(0)
+        for item in sorted(datos.items(), key=lambda x: x[1][4]):
+            archivo_partida(item)
     print("El juego ha finalizado")
 
 main()
@@ -340,3 +351,4 @@ palabras_validas_cuentos.close()
 palabras_validas_arania_negra.close()
 caracteres_reemplazar.close()
 arch_config.close()
+arch_partida.close()
