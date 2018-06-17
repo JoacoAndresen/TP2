@@ -115,6 +115,26 @@ def merge(archivo1, archivo2, archivo3, archivo_palabras):
         if p1 == palabra3:
             linea3 = leerLineaALinea(archivo3, "zzz")
             palabra3 = linea3.rstrip()
+    archivo1.seek(0)
+    archivo2.seek(0)
+    archivo3.seek(0)
+    archivo_palabras.seek(0)
+
+def total_palabras(archivo_palabras):
+    linea = archivo_palabras.readline()
+    cantidad_por_len = {}
+    total = 0
+    while linea:
+        palabra = linea.strip()
+        len_palabra = len(palabra)
+        if str(len_palabra) not in cantidad_por_len:
+            cantidad_por_len[str(len_palabra)] = len_palabra
+        else:
+            cantidad_por_len[str(len_palabra)] += len_palabra
+        total += 1
+        linea = archivo_palabras.readline()
+    for item in sorted(cantidad_por_len.items(), key=lambda x: int(x[0])):
+        print("Hay " + str(item[1]) + " palabras de longitud: " + item[0])
 
 escribirArchivos(arch_cuentos, palabras_validas_cuentos)
 escribirArchivos(arch_arania_negra, palabras_validas_arania_negra)
@@ -122,6 +142,7 @@ escribirArchivos(arch_1000_noches_y_1_noche, palabras_validas_1000_noches_y_1_no
 
 merge(palabras_validas_cuentos, palabras_validas_arania_negra, palabras_validas_1000_noches_y_1_noche, arch_palabras)
 
+total_palabras(arch_palabras)
 
 arch_cuentos.close()
 arch_arania_negra.close()
