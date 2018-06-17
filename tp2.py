@@ -1,14 +1,6 @@
 import platform
-
-arch_cuentos = open('Cuentos.txt', encoding="ISO-8859-1")
-arch_arania_negra = open('La araña negra - tomo 1.txt', encoding="ISO-8859-1")
-arch_1000_noches_y_1_noche = open('Las 1000 Noches y 1 Noche.txt', encoding="ISO-8859-1")
-arch_palabras = open('palabras.txt', 'w+')
-palabras_validas_cuentos = open('palabras_texto_cuentos.txt', 'w+')
-palabras_validas_arania_negra = open('palabras_texto_arania_negra.txt', 'w+')
-palabras_validas_1000_noches_y_1_noche = open('palabras_texto_1000_noches_y_1_noche.txt', 'w+')
-caracteres_reemplazar = open('reemplazar.txt', encoding="ISO-8859-1")
-
+import random
+import time
 
 def sistemaOperativo():
     """Programada por Joaquín Andresen.
@@ -137,11 +129,85 @@ def total_palabras(archivo_palabras):
     for item in sorted(cantidad_por_len.items(), key=lambda x: int(x[0])):
         print("Hay " + str(item[1]) + " palabras de longitud: " + item[0])
 
+def cantidad_jugadores():
+    """Programada por Fernando Fabbiano.
+    Solicita la cantidad de jugadores, y en el caso de que la respuesta no sea un entero,
+    vuelve a pedir la cantidad"""
+    cantidad = input("Ingresar la cantidad de jugadores: ")
+    while not cantidad.isdigit() or int(cantidad) > 10:
+        cantidad = input("Error, ingrese una cantidad de jugadores menor o igual a 10: ")
+    return int(cantidad)
+
+def solicitar_nombres():
+    """Programada por Fernando Fabbiano.
+    Pide una cierta cantidad de nombres, basandose en la cantidad otorgada por la funcion cantidad_jugadores"""
+    jugadores = []
+    cantidad = cantidad_jugadores()
+    for numero in range(1, cantidad+1):
+        nombre = input("Ingrese el nombre del jugador "+str(numero)+": ").upper()
+        jugadores.append(nombre)
+    return jugadores
+
+def random_jugadores():
+    """Programada por Joaquín Andresen.
+    Toma la lista de jugadores y la devuelve mezclada"""
+    jugadores = solicitar_nombres()
+    random.shuffle(jugadores)
+    return jugadores
+
+def solicitar_longitud():
+    """Programada por Maximiliano Coppola.
+    Solicita la longitud de la palabra a adivinar, y en caso de no ser una entero, vuelve a solicitar"""
+    longitud = input("Ingrese la longitud de la palabra a adivinar: ")
+    while not longitud.isdigit() or int(longitud) < 5:
+        longitud = input("Error, ingrese una longitud mayor o igual a 5: ")
+    return longitud
+
+def random_linea(archivo):
+    linea = archivo.readline()
+    for num, linea_random in enumerate(archivo):
+        if random.randrange(num + 2): continue
+        linea = linea_random
+    archivo.seek(0)
+    return linea
+
+def random_palabra(longitud):
+    palabra = random_linea(arch_palabras).strip()
+    while len(palabra) != longitud:
+        palabra = random_linea(arch_palabras).strip()
+    arch_palabras.seek(0)
+    return  palabra
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+arch_cuentos = open('Cuentos.txt', encoding="ISO-8859-1")
+arch_arania_negra = open('La araña negra - tomo 1.txt', encoding="ISO-8859-1")
+arch_1000_noches_y_1_noche = open('Las 1000 Noches y 1 Noche.txt', encoding="ISO-8859-1")
+arch_palabras = open('palabras.txt', 'w+')
+palabras_validas_cuentos = open('palabras_texto_cuentos.txt', 'w+')
+palabras_validas_arania_negra = open('palabras_texto_arania_negra.txt', 'w+')
+palabras_validas_1000_noches_y_1_noche = open('palabras_texto_1000_noches_y_1_noche.txt', 'w+')
+caracteres_reemplazar = open('reemplazar.txt', encoding="ISO-8859-1")
+
+
 escribirArchivos(arch_cuentos, palabras_validas_cuentos)
 escribirArchivos(arch_arania_negra, palabras_validas_arania_negra)
 escribirArchivos(arch_1000_noches_y_1_noche, palabras_validas_1000_noches_y_1_noche)
 
 merge(palabras_validas_cuentos, palabras_validas_arania_negra, palabras_validas_1000_noches_y_1_noche, arch_palabras)
+
+print(random_palabra(5))
 
 total_palabras(arch_palabras)
 
