@@ -2,6 +2,15 @@ import platform
 import random
 import time
 
+arch_cuentos = open('Cuentos.txt', encoding="ISO-8859-1")
+arch_arania_negra = open('La araña negra - tomo 1.txt', encoding="ISO-8859-1")
+arch_1000_noches_y_1_noche = open('Las 1000 Noches y 1 Noche.txt', encoding="ISO-8859-1")
+arch_palabras = open('palabras.txt', 'w+')
+palabras_validas_cuentos = open('palabras_texto_cuentos.txt', 'w+')
+palabras_validas_arania_negra = open('palabras_texto_arania_negra.txt', 'w+')
+palabras_validas_1000_noches_y_1_noche = open('palabras_texto_1000_noches_y_1_noche.txt', 'w+')
+caracteres_reemplazar = open('reemplazar.txt', encoding="ISO-8859-1")
+
 def sistemaOperativo():
     """Programada por Joaquín Andresen.
     Detecta el sistema operativo del usuario"""
@@ -64,7 +73,6 @@ def escribirArchivos(archivo_leer, archivo_escribir):
             archivo_escribir.write(palabra[0]+"\n")
         else:
             archivo_escribir.write((palabra[0]+"\n").encode('ascii', 'ignore').decode('ascii'))
-    print("Datos guardados exitosamente!")
     archivo_leer.seek(0)
     archivo_escribir.seek(0)
 
@@ -83,14 +91,16 @@ def leerLineaALinea(archivo, default):
     return linea if linea else default
 
 def merge(archivo1, archivo2, archivo3, archivo_palabras):
+    """Programada por Fernando Fabbiano.
+     Merge entre los tres archivos que contienen los cuentos ya procesados, y ordenados alfabeticamente.
+     Crea un único archivo llamada palabras, que contiene las palabras de los tres cuentos, sin repetir, y ordenadas
+     alfabéticamente."""
     linea1 = leerLineaALinea(archivo1, "zzz")
     linea2 = leerLineaALinea(archivo2, "zzz")
     linea3 = leerLineaALinea(archivo3, "zzz")
-
     palabra1 = linea1.rstrip()
     palabra2 = linea2.rstrip()
     palabra3 = linea3.rstrip()
-
     while palabra1 != "zzz" or palabra2 != "zzz" or palabra3 != "zzz":
         palabratxt = arch_palabras
         leerLineaALinea(palabratxt, "zzz")
@@ -125,15 +135,17 @@ def total_palabras(archivo_palabras):
         else:
             cantidad_por_len[str(len_palabra)] += 1
         linea = archivo_palabras.readline()
-    print("Hay " + str(total) + " palabras en total")
+    print("Hay " + str(total) + " palabras en total\n")
+    time.sleep(1.0)
     for item in sorted(cantidad_por_len.items(), key=lambda x: int(x[0])):
         print("Hay " + str(item[1]) + " palabras de longitud: " + item[0])
+        time.sleep(0.5)
 
 def cantidad_jugadores():
     """Programada por Fernando Fabbiano.
     Solicita la cantidad de jugadores, y en el caso de que la respuesta no sea un entero,
     vuelve a pedir la cantidad"""
-    cantidad = input("Ingresar la cantidad de jugadores: ")
+    cantidad = input("\nIngresar la cantidad de jugadores: ")
     while not cantidad.isdigit() or int(cantidad) > 10:
         cantidad = input("Error, ingrese una cantidad de jugadores menor o igual a 10: ")
     return int(cantidad)
@@ -158,10 +170,10 @@ def random_jugadores():
 def solicitar_longitud():
     """Programada por Maximiliano Coppola.
     Solicita la longitud de la palabra a adivinar, y en caso de no ser una entero, vuelve a solicitar"""
-    longitud = input("Ingrese la longitud de la palabra a adivinar: ")
+    longitud = input("\nIngrese la longitud de la palabra a adivinar: ")
     while not longitud.isdigit() or int(longitud) < 5:
-        longitud = input("Error, ingrese una longitud mayor o igual a 5: ")
-    return longitud
+        longitud = input("\nError, ingrese una longitud mayor o igual a 5: ")
+    return int(longitud)
 
 def random_linea(archivo):
     linea = archivo.readline()
@@ -176,40 +188,137 @@ def random_palabra(longitud):
     while len(palabra) != longitud:
         palabra = random_linea(arch_palabras).strip()
     arch_palabras.seek(0)
-    return  palabra
+    return str(palabra)
 
+def ingresar_letra(utilizadas):
+    """Programada por Joaquín Andresen.
+    Solicita una letra, y en caso de no ser un caracter válido, vuelve a solicitar"""
+    letra = input("Ingrese una letra: ")
+    while letra.isdigit() == True or len(letra) != 1 or letra in utilizadas:
+        letra = input("Error, ingrese una letra valida: ")
+    return letra.upper()
 
+def mensaje_de_turno(datos, jugador):
+    """Programada por Santiago Álvarez.
+    Recibe el nombre de un jugador con sus datos, y muestra el mensaje de turno de ese jugador"""
+    print("\n")
+    print("Turno de " + str(jugador))
+    print("".join(datos[jugador][6]), "Aciertos: " + str(datos[jugador][0]),
+          "Desaciertos: " + str(datos[jugador][1]), "Puntos: " + str(datos[jugador][4]),
+          "Letras utilizadas: " + str(datos[jugador][7]), "\n")
 
+def ahorcado(jugadores, datos):
+    """Programada por todos.
+    Sistema de turnos, hace que cada jugador juegue hasta que se equivoque para pasar al siguiente,
+    asi sucesivamente hasta que algun jugador adivine la palabra o todos superen el limite de desaciertos"""
+    time.sleep(1.0)
+    print("\nEl orden en que jugaran será:", ', '.join([jugador for jugador in jugadores]))
+    longitud = solicitar_longitud()
+    contador = 0
+    datos1 = datos
+    arch_palabras.seek(0)
+    for jugador in jugadores:
+        datos1[jugador][0] = 0
+        datos1[jugador][1] = 0
+        datos1[jugador][7] = []
+        datos1[jugador][5] = random_palabra(longitud)
+        datos1[jugador][6] = []
+        datos1[jugador][8] = 0
+        for y in datos1[jugador][5]:
+            datos1[jugador][6].append("_")
+    while contador/len(jugadores) != 8:
+        for jugador in jugadores:
+            if datos1[jugador][8] < 8:
+                mensaje_de_turno(datos1, jugador)
+                letra = ingresar_letra(datos1[jugador][7])
+                datos1[jugador][8] += 1
+                contador += 1
+                if letra not in datos1[jugador][7]:
+                    datos1[jugador][7].append(letra)
+                while letra in list(datos1[jugador][5]) and "_" in datos1[jugador][6]:
+                    datos1[jugador][4] += 1
+                    for z in range(len(datos1[jugador][5])):
+                        if letra == datos1[jugador][5][z]:
+                            datos1[jugador][6][z] = letra
+                    if "_" not in datos1[jugador][6]:
+                        print("\n", "Felicidades " + jugador + ", has ganado!", "\n")
+                        ganador = jugador
+                        datos1[jugador][4] += 30
+                        return datos1, ganador
+                    if letra in list(datos1[jugador][5]):
+                        datos1[jugador][0] += 1
+                        datos1[jugador][2] += 1
+                    mensaje_de_turno(datos1, jugador)
+                    letra = ingresar_letra(datos1[jugador][7])
+                    datos1[jugador][8] += 1
+                    contador += 1
+                    if letra not in datos1[jugador][7]:
+                        datos1[jugador][7].append(letra)
+                datos1[jugador][4] -= 2
+                datos1[jugador][1] += 1
+                datos1[jugador][3] += 1
+    print("\n", "Ha ganado el programa", "\n")
+    ganador = "CPU"
+    return datos1, ganador
 
+def main():
+    """ Programada por todos.
+    Funcion principal que junta todos los datos obtenidos y corre el juego. datos[0] son los aciertos de la partida,
+    datos[1] son los desaciertos, datos[2] son los aciertos totales, datos[3] son los desaciertos totales,
+    datos[4] son los puntos, datos[5] es la palabra a divinar, datos[6] es la palabra a davinar con los guiones bajos,
+    datos[7] son las letras utilizadas, datos[8] es el contador de turnos de el jugador. """
+    print("Bienvenidos al Ahorcado, desarrollado por: ")
+    time.sleep(1.0)
+    print(''' 
+    _________             __                                            
+    \_   ___ \_____      |__|____      ____   ____   ________________   
+    /    \  \/\__  \     |  \__  \    /    \_/ __ \ / ___\_  __ \__  \  
+    \     \____/ __ \_   |  |/ __ \_ |   |  \  ___// /_/  >  | \// __ \_
+     \______  (____  /\__|  (____  / |___|  /\___  >___  /|__|  (____  /
+            \/     \/\______|    \/       \/     \/_____/            \/ ''', end=" ")
+    time.sleep(1.0)
+    print("v2.0\n")
+    time.sleep(1.0)
+    escribirArchivos(arch_cuentos, palabras_validas_cuentos)
+    escribirArchivos(arch_arania_negra, palabras_validas_arania_negra)
+    escribirArchivos(arch_1000_noches_y_1_noche, palabras_validas_1000_noches_y_1_noche)
+    merge(palabras_validas_cuentos, palabras_validas_arania_negra, palabras_validas_1000_noches_y_1_noche,
+          arch_palabras)
+    total_palabras(arch_palabras)
+    time.sleep(1.0)
+    jugadores = random_jugadores()
+    seguir = 1
+    valido = [0, 1]
+    datos = {}
+    partidas_jugadas = 0
+    for jugador in jugadores:
+        datos[jugador] = [0, 0, 0, 0, 0, "", [], [], 0]
+    while seguir:
+        partidas_jugadas += 1
+        datos, ganador = ahorcado(jugadores, datos)
+        print("Resultados Generales:")
+        for jugador in jugadores:
+            print("Datos de " + jugador, "\n", "Palabra: " + datos[jugador][5], "\n", "Puntaje: " + str(datos[jugador][4]),
+                  "\n", "Aciertos: " + str(datos[jugador][2]), "\n", "Desaciertos: " + str(datos[jugador][3]), "\n")
+        if partidas_jugadas > 1:
+            print("Partidas Jugadas: " + str(partidas_jugadas))
+        jugadores.clear()
+        if ganador == "CPU":
+            for item in sorted(datos.items(), key=lambda y: y[1][4], reverse=True):
+                jugadores.append(item[0])
+        else:
+            jugadores.append(ganador)
+            for item in sorted(datos.items(), key=lambda y: y[1][4], reverse=True):
+                if item[0] != ganador:
+                    jugadores.append(item[0])
+        seguir = input("Desea jugar otra partida? (0 = no, 1 = si) ")
+        if not seguir.isdigit() or int(seguir) not in valido:
+            seguir = input("Error, ingrese 1 para continuar y 0 para finalizar la partida: ")
+        seguir = int(seguir)
+        arch_palabras.seek(0)
+    print("El juego ha finalizado")
 
-
-
-
-
-
-
-
-
-
-arch_cuentos = open('Cuentos.txt', encoding="ISO-8859-1")
-arch_arania_negra = open('La araña negra - tomo 1.txt', encoding="ISO-8859-1")
-arch_1000_noches_y_1_noche = open('Las 1000 Noches y 1 Noche.txt', encoding="ISO-8859-1")
-arch_palabras = open('palabras.txt', 'w+')
-palabras_validas_cuentos = open('palabras_texto_cuentos.txt', 'w+')
-palabras_validas_arania_negra = open('palabras_texto_arania_negra.txt', 'w+')
-palabras_validas_1000_noches_y_1_noche = open('palabras_texto_1000_noches_y_1_noche.txt', 'w+')
-caracteres_reemplazar = open('reemplazar.txt', encoding="ISO-8859-1")
-
-
-escribirArchivos(arch_cuentos, palabras_validas_cuentos)
-escribirArchivos(arch_arania_negra, palabras_validas_arania_negra)
-escribirArchivos(arch_1000_noches_y_1_noche, palabras_validas_1000_noches_y_1_noche)
-
-merge(palabras_validas_cuentos, palabras_validas_arania_negra, palabras_validas_1000_noches_y_1_noche, arch_palabras)
-
-print(random_palabra(5))
-
-total_palabras(arch_palabras)
+main()
 
 arch_cuentos.close()
 arch_arania_negra.close()
