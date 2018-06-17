@@ -15,6 +15,7 @@ def sistemaOperativo():
     Detecta el sistema operativo del usuario"""
     return platform.system()
 
+
 def leer_archivo(archivo):
     linea = archivo.readline()
     lista = []
@@ -61,6 +62,7 @@ def contar_palabras(lista):
                     diccionario[palabra] = 1
     return diccionario
 
+
 def escribirArchivos(archivo_leer, archivo_escribir):
     """Programada por Joaquín Andresen.
     Recibe dos archivos, lee archivo_leer y crea un diccionario con sus palabras, luego procede a escribir el contenido
@@ -76,6 +78,7 @@ def escribirArchivos(archivo_leer, archivo_escribir):
     archivo_leer.seek(0)
     archivo_escribir.seek(0)
 
+
 def reemplazar(palabra):
     linea = caracteres_reemplazar.readline()
     while linea:
@@ -90,37 +93,42 @@ def leerLineaALinea(archivo, default):
     # print(linea)
     return linea if linea else default
 
+
 escribirArchivos(arch_cuentos, palabras_validas_cuentos)
 escribirArchivos(arch_arania_negra, palabras_validas_arania_negra)
 escribirArchivos(arch_1000_noches_y_1_noche, palabras_validas_1000_noches_y_1_noche)
 
-linea1 = leerLineaALinea(palabras_validas_cuentos, "zzz")
-linea2 = leerLineaALinea(palabras_validas_1000_noches_y_1_noche, "zzz")
-linea3 = leerLineaALinea(palabras_validas_arania_negra, "zzz")
 
-palabra1 = linea1.rstrip()
-palabra2 = linea2.rstrip()
-palabra3 = linea3.rstrip()
+def mergeArchivos():
+    """Programada por Fernando Fabbiano.
+      Merge entre los tres archivos que contienen los cuentos ya procesados, y ordenados alfabeticamente.
+      Crea un único archivo llamada palabras, que contiene las palabras de los tres cuentos, sin repetir, y ordenadas
+      alfabéticamente."""
+    linea1 = leerLineaALinea(palabras_validas_cuentos, "zzz")
+    linea2 = leerLineaALinea(palabras_validas_1000_noches_y_1_noche, "zzz")
+    linea3 = leerLineaALinea(palabras_validas_arania_negra, "zzz")
+    palabra1 = linea1.rstrip()
+    palabra2 = linea2.rstrip()
+    palabra3 = linea3.rstrip()
+    while palabra1 != "zzz" or palabra2 != "zzz" or palabra3 != "zzz":
+        palabratxt = arch_palabras
+        leerLineaALinea(palabratxt, "zzz")
+        lista = [palabra1, palabra2, palabra3]
+        p1 = min(lista)
+        if p1 not in palabratxt:
+            palabratxt.write(p1 + "\n")
+        if p1 == palabra1:
+            linea1 = leerLineaALinea(palabras_validas_cuentos, "zzz")
+            palabra1 = linea1.rstrip()
+        if p1 == palabra2:
+            linea2 = leerLineaALinea(palabras_validas_1000_noches_y_1_noche, "zzz")
+            palabra2 = linea2.rstrip()
+        if p1 == palabra3:
+            linea3 = leerLineaALinea(palabras_validas_arania_negra, "zzz")
+            palabra3 = linea3.rstrip()
 
 
-while palabra1 != "zzz" or palabra2 != "zzz" or palabra3 != "zzz":
-    palabratxt = arch_palabras
-    leerLineaALinea(palabratxt, "zzz")
-    lista = [palabra1, palabra2, palabra3]
-    p1 = min(lista)
-    if p1 not in palabratxt:
-        palabratxt.write(p1 + "\n")
-    if p1 == palabra1:
-        linea1 = leerLineaALinea(palabras_validas_cuentos, "zzz")
-        palabra1 = linea1.rstrip()
-    if p1 == palabra2:
-        linea2 = leerLineaALinea(palabras_validas_1000_noches_y_1_noche, "zzz")
-        palabra2 = linea2.rstrip()
-    if p1 == palabra3:
-        linea3 = leerLineaALinea(palabras_validas_arania_negra, "zzz")
-        palabra3 = linea3.rstrip()
-
-
+mergeArchivos()
 arch_cuentos.close()
 arch_arania_negra.close()
 arch_1000_noches_y_1_noche.close()
