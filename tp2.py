@@ -96,6 +96,9 @@ def reemplazar(palabra):
 
 
 def leerLineaALinea(archivo, default):
+    """Programada por Fernando Fabbiano.
+    Lee una linea del archivo, y la devuelve si es que la encuentra, en caso de no haber mas lineas en el archivo,
+    devuelve el default"""
     linea = archivo.readline()
     return linea if linea else default
 
