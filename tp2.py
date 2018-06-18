@@ -2,24 +2,13 @@ import platform
 import random
 import time
 
-arch_cuentos = open('Cuentos.txt', encoding="ISO-8859-1")
-arch_arania_negra = open('La araña negra - tomo 1.txt', encoding="ISO-8859-1")
-arch_1000_noches_y_1_noche = open('Las 1000 Noches y 1 Noche.txt', encoding="ISO-8859-1")
-arch_palabras = open('palabras.txt', 'w+')
-palabras_validas_cuentos = open('palabras_texto_cuentos.txt', 'w+')
-palabras_validas_arania_negra = open('palabras_texto_arania_negra.txt', 'w+')
-palabras_validas_1000_noches_y_1_noche = open('palabras_texto_1000_noches_y_1_noche.txt', 'w+')
-caracteres_reemplazar = open('reemplazar.txt', encoding="ISO-8859-1")
-arch_config = open('configuracion.txt', encoding="ISO-8859-1")
-arch_partida = open('partida.txt', 'w+')
-
 def sistemaOperativo():
     """Programada por Joaquín Andresen.
     Detecta el sistema operativo del usuario"""
     return platform.system()
 
 def leer_archivo(archivo):
-    """Programada por .
+    """Programada por Maximiliano Coppolla.
     Devuelve una lista con todas las palabras validas de un archivo."""
     linea = archivo.readline()
     lista = []
@@ -33,7 +22,7 @@ def leer_archivo(archivo):
 
 
 def pasarTextoALista(lineaTexto):
-    """Programada por .
+    """Programada por Maximiliano Coppolla.
     Recibe una linea de texto y devuelve una lista con las palabras de esa linea."""
     listaPalabras = lineaTexto.split()
     return listaPalabras
@@ -51,7 +40,7 @@ def es_texto_valido(palabra):
 
 
 def contar_palabras(lista, configuracion):
-    """Programada por .
+    """Programada por Fernando Fabbiano.
     Devuelve un diccionario formado por todas las palabras validas del texto y su cantidad de repeticiones. """
     diccionario = {}
     for renglon in lista:
@@ -70,7 +59,7 @@ def contar_palabras(lista, configuracion):
     return diccionario
 
 def escribirArchivos(archivo_leer, archivo_escribir, configuracion):
-    """Programada por Joaquín Andresen.
+    """Programada por Santiago Álvarez.
     Recibe dos archivos, lee archivo_leer y crea un diccionario con sus palabras, luego procede a escribir el contenido
     del diccionario en archivo_escribir."""
     lista_de_palabras = leer_archivo(archivo_leer)
@@ -135,7 +124,7 @@ def merge(archivo1, archivo2, archivo3, archivo_palabras):
     archivo_palabras.seek(0)
 
 def total_palabras(archivo_palabras):
-    """Programada por Joaquín Andresen.
+    """Programada por Santiago Álvarez.
     Cuenta cuantas palabras hay en el archivo palabras.txt, y tambien cuenta cuantas palabras hay por longitud por
     medio de un diccionario. Luego imprime la cantidad de palabras, y el diccionario."""
     linea = archivo_palabras.readline()
@@ -211,7 +200,7 @@ def random_palabra(longitud):
     return str(palabra)
 
 def ingresar_letra(utilizadas):
-    """Programada por Joaquín Andresen.
+    """Programada por Maximiliano Coppolla.
     Solicita una letra, y en caso de no ser un caracter válido, vuelve a solicitar"""
     letra = input("Ingrese una letra: ")
     while letra.isdigit() == True or len(letra) != 1 or letra in utilizadas:
@@ -228,7 +217,7 @@ def mensaje_de_turno(datos, jugador):
           "Letras utilizadas: " + str(datos[jugador][7]), "\n")
 
 def leer_configuracion():
-    """Programada por Joaquín Andresen.
+    """Programada por Santiago Álvarez.
     Lee el archivo configuración y devuelve una lista de listas,
     cada una con el nombre de la configuracion y su valor."""
     linea = arch_config.readline()
@@ -245,11 +234,11 @@ def archivo_partida(datos):
     para escribir utilizara, ya que Linux y Mac requieren un metodo diferente a Windows."""
     if sistemaOperativo() == "Windows":
         arch_partida.write(datos[0] + ", ACIERTOS" + str(datos[1][2]) + ", DESACIERTOS " + str(datos[1][3]) +
-                           ", PUNTOS " + str(datos[1][4]) + ", PALABRAS " + str(datos[1][9]))
+                           ", PUNTOS " + str(datos[1][4]) + ", PALABRAS " + str(datos[1][9]) + "\n")
     else:
         arch_partida.write((datos[0] + ", ACIERTOS " + str(datos[1][2]) + ", DESACIERTOS " + str(datos[1][3]) +
-                            ", PUNTOS " + str(datos[1][4]) + ", PALABRAS " + str(datos[1][9])).encode('ascii', 'ignore')
-                           .decode('ascii'))
+                            ", PUNTOS " + str(datos[1][4]) + ", PALABRAS " + str(datos[1][9])+ "\n")
+                           .encode('ascii', 'ignore').decode('ascii'))
 
 def ahorcado(jugadores, datos, configuracion):
     """Programada por todos.
@@ -326,6 +315,7 @@ def main():
     print("v2.0\n")
     time.sleep(1.0)
     configuracion = leer_configuracion()
+    # Aqui comienza la lecura de los archivos para luego realizar el merge
     escribirArchivos(arch_cuentos, palabras_validas_cuentos, configuracion)
     escribirArchivos(arch_arania_negra, palabras_validas_arania_negra, configuracion)
     escribirArchivos(arch_1000_noches_y_1_noche, palabras_validas_1000_noches_y_1_noche, configuracion)
@@ -335,9 +325,9 @@ def main():
     time.sleep(1.0)
     jugadores = random_jugadores(configuracion)
     seguir = 1
-    valido = [0, 1]
-    datos = {}
+    valido = [0, 1] # Esta lista se utiliza más adelante cuando se pregunta al usuario si desea continuar con el juego
     partidas_jugadas = 0
+    datos = {} # Cada jugador tendra una clave asignada al diccionario en donde habra una lista con sus datos
     for jugador in jugadores:
         datos[jugador] = [0, 0, 0, 0, 0, "", [], [], 0, []]
     while seguir:
@@ -363,9 +353,22 @@ def main():
             seguir = input("Error, ingrese 1 para continuar y 0 para finalizar la partida: ")
         seguir = int(seguir)
         arch_palabras.seek(0)
-        for item in sorted(datos.items(), key=lambda x: x[1][4]):
-            archivo_partida(item)
+    for item in sorted(datos.items(), key=lambda x: x[1][4]):
+        archivo_partida(item)
     print("El juego ha finalizado")
+
+# Aqui empieza la ejecución del programa comenzando con los archivos de texto
+
+arch_cuentos = open('Cuentos.txt', encoding="ISO-8859-1")
+arch_arania_negra = open('La araña negra - tomo 1.txt', encoding="ISO-8859-1")
+arch_1000_noches_y_1_noche = open('Las 1000 Noches y 1 Noche.txt', encoding="ISO-8859-1")
+arch_palabras = open('palabras.txt', 'w+')
+palabras_validas_cuentos = open('palabras_texto_cuentos.txt', 'w+')
+palabras_validas_arania_negra = open('palabras_texto_arania_negra.txt', 'w+')
+palabras_validas_1000_noches_y_1_noche = open('palabras_texto_1000_noches_y_1_noche.txt', 'w+')
+caracteres_reemplazar = open('reemplazar.txt', encoding="ISO-8859-1")
+arch_config = open('configuracion.txt', encoding="ISO-8859-1")
+arch_partida = open('partida.txt', 'w+')
 
 main()
 
