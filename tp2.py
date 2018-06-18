@@ -19,6 +19,8 @@ def sistemaOperativo():
     return platform.system()
 
 def leer_archivo(archivo):
+    """Programada por .
+    Devuelve una lista con todas las palabras validas de un archivo."""
     linea = archivo.readline()
     lista = []
     while linea:
@@ -31,6 +33,8 @@ def leer_archivo(archivo):
 
 
 def pasarTextoALista(lineaTexto):
+    """Programada por .
+    Recibe una linea de texto y devuelve una lista con las palabras de esa linea."""
     listaPalabras = lineaTexto.split()
     return listaPalabras
 
@@ -47,7 +51,8 @@ def es_texto_valido(palabra):
 
 
 def contar_palabras(lista, configuracion):
-    """ Devuelve un diccionario formado por todas las palabras validas del texto y su cantidad de repeticiones. """
+    """Programada por .
+    Devuelve un diccionario formado por todas las palabras validas del texto y su cantidad de repeticiones. """
     diccionario = {}
     for renglon in lista:
         palabras = renglon.split()
@@ -79,6 +84,9 @@ def escribirArchivos(archivo_leer, archivo_escribir, configuracion):
     archivo_escribir.seek(0)
 
 def reemplazar(palabra):
+    """Programada por Joaquín Andresen.
+    Recibe una palabra, y reemplaza los carateres que indica el archivo reemplazar.txt,
+    luego devuelve la palabra modificada"""
     linea = caracteres_reemplazar.readline()
     while linea:
         caracteres = linea.strip().split(",")
@@ -89,13 +97,12 @@ def reemplazar(palabra):
 
 def leerLineaALinea(archivo, default):
     linea = archivo.readline()
-    # print(linea)
     return linea if linea else default
 
 def merge(archivo1, archivo2, archivo3, archivo_palabras):
     """Programada por Fernando Fabbiano.
      Merge entre los tres archivos que contienen los cuentos ya procesados, y ordenados alfabeticamente.
-     Crea un único archivo llamada palabras, que contiene las palabras de los tres cuentos, sin repetir, y ordenadas
+     Crea un único archivo llamado palabras, que contiene las palabras de los tres cuentos, sin repetir, y ordenadas
      alfabéticamente."""
     linea1 = leerLineaALinea(archivo1, "zzz")
     linea2 = leerLineaALinea(archivo2, "zzz")
@@ -125,6 +132,9 @@ def merge(archivo1, archivo2, archivo3, archivo_palabras):
     archivo_palabras.seek(0)
 
 def total_palabras(archivo_palabras):
+    """Programada por Joaquín Andresen.
+    Cuenta cuantas palabras hay en el archivo palabras.txt, y tambien cuenta cuantas palabras hay por longitud por
+    medio de un diccionario. Luego imprime la cantidad de palabras, y el diccionario."""
     linea = archivo_palabras.readline()
     cantidad_por_len = {}
     total = 0
@@ -178,6 +188,8 @@ def solicitar_longitud():
     return int(longitud)
 
 def random_linea(archivo):
+    """Programada por Joaquín Andresen.
+    Elige una linea de un archivo de manera aleatoria."""
     linea = archivo.readline()
     for num, linea_random in enumerate(archivo):
         if random.randrange(num + 2): continue
@@ -186,6 +198,9 @@ def random_linea(archivo):
     return linea
 
 def random_palabra(longitud):
+    """Programada por Joaquín Andresen.
+    Utiliza la función random_linea para buscar una linea que contenga una palabra con la longitud recibida,
+    luego la devuelve."""
     palabra = random_linea(arch_palabras).strip()
     while len(palabra) != longitud:
         palabra = random_linea(arch_palabras).strip()
@@ -210,6 +225,9 @@ def mensaje_de_turno(datos, jugador):
           "Letras utilizadas: " + str(datos[jugador][7]), "\n")
 
 def leer_configuracion():
+    """Programada por Joaquín Andresen.
+    Lee el archivo configuración y devuelve una lista de listas,
+    cada una con el nombre de la configuracion y su valor."""
     linea = arch_config.readline()
     configuracion = []
     while linea:
@@ -219,10 +237,16 @@ def leer_configuracion():
     return configuracion
 
 def archivo_partida(datos):
+    """Programada por Joaquín Andresen.
+    Escribe los datos que recibe en el archivo partidad.txt. Utiliza la función sistemaOperativo para saber que metodo
+    para escribir utilizara, ya que Linux y Mac requieren un metodo diferente a Windows."""
     if sistemaOperativo() == "Windows":
-        arch_partida.write(datos[0] + ", ACIERTOS" + str(datos[1][2]) + ", DESACIERTOS " + str(datos[1][3]) + ", PUNTOS " + str(datos[1][4]) + ", PALABRAS " + str(datos[1][9]))
+        arch_partida.write(datos[0] + ", ACIERTOS" + str(datos[1][2]) + ", DESACIERTOS " + str(datos[1][3]) +
+                           ", PUNTOS " + str(datos[1][4]) + ", PALABRAS " + str(datos[1][9]))
     else:
-        arch_partida.write((datos[0] + ", ACIERTOS " + str(datos[1][2]) + ", DESACIERTOS " + str(datos[1][3]) + ", PUNTOS " + str(datos[1][4]) + ", PALABRAS " + str(datos[1][9])).encode('ascii', 'ignore').decode('ascii'))
+        arch_partida.write((datos[0] + ", ACIERTOS " + str(datos[1][2]) + ", DESACIERTOS " + str(datos[1][3]) +
+                            ", PUNTOS " + str(datos[1][4]) + ", PALABRAS " + str(datos[1][9])).encode('ascii', 'ignore')
+                           .decode('ascii'))
 
 def ahorcado(jugadores, datos, configuracion):
     """Programada por todos.
