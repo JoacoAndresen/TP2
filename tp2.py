@@ -139,18 +139,15 @@ def total_palabras(archivo_palabras):
         else:
             cantidad_por_len[str(len_palabra)] += 1
         linea = archivo_palabras.readline()
-    print("Hay " + str(total) + " palabras en total\n")
-    time.sleep(1.0)
-    for item in sorted(cantidad_por_len.items(), key=lambda x: int(x[0])):
-        print("Hay " + str(item[1]) + " palabras de longitud: " + item[0])
-        time.sleep(0.5)
+    arch_palabras.seek(0)
+    return cantidad_por_len
 
 def cantidad_jugadores(configuracion):
     """Programada por Fernando Fabbiano.
     Solicita la cantidad de jugadores, y en el caso de que la respuesta no sea un entero,
     vuelve a pedir la cantidad"""
     cantidad = input("\nIngresar la cantidad de jugadores: ")
-    while not cantidad.isdigit() or int(cantidad) > int(configuracion[0][1]) or int(cantidad) < 0:
+    while not cantidad.isdigit() or int(cantidad) > int(configuracion[0][1]) or int(cantidad) <= 0:
         cantidad = input("Error, ingrese una cantidad de jugadores menor o igual a 10: ")
     return int(cantidad)
 
@@ -175,7 +172,7 @@ def solicitar_longitud():
     """Programada por Maximiliano Coppola.
     Solicita la longitud de la palabra a adivinar, y en caso de no ser una entero, vuelve a solicitar"""
     longitud = input("\nIngrese la longitud de la palabra a adivinar: ")
-    while not longitud.isdigit() or int(longitud) < 5:
+    while not longitud.isdigit() or int(longitud) < 5 or longitud not in total_palabras(arch_palabras):
         longitud = input("\nError, ingrese una longitud mayor o igual a 5: ")
     return int(longitud)
 
@@ -203,7 +200,7 @@ def ingresar_letra(utilizadas):
     """Programada por Maximiliano Coppolla.
     Solicita una letra, y en caso de no ser un caracter válido, vuelve a solicitar"""
     letra = input("Ingrese una letra: ")
-    while letra.isdigit() == True or len(letra) != 1 or letra in utilizadas:
+    while letra.isdigit() == True or len(letra) != 1 or letra.upper() in utilizadas:
         letra = input("Error, ingrese una letra valida: ")
     return letra.upper()
 
@@ -234,10 +231,10 @@ def archivo_partida(datos):
     para escribir utilizara, ya que Linux y Mac requieren un metodo diferente a Windows."""
     if sistemaOperativo() == "Windows":
         arch_partida.write(datos[0] + ", ACIERTOS" + str(datos[1][2]) + ", DESACIERTOS " + str(datos[1][3]) +
-                           ", PUNTOS " + str(datos[1][4]) + ", PALABRAS " + str(datos[1][9]) + "\n")
+                           ", PUNTOS " + str(datos[1][4]) + ", PALABRAS " + str(datos[1][8]) + "\n")
     else:
         arch_partida.write((datos[0] + ", ACIERTOS " + str(datos[1][2]) + ", DESACIERTOS " + str(datos[1][3]) +
-                            ", PUNTOS " + str(datos[1][4]) + ", PALABRAS " + str(datos[1][9])+ "\n")
+                            ", PUNTOS " + str(datos[1][4]) + ", PALABRAS " + str(datos[1][8])+ "\n")
                            .encode('ascii', 'ignore').decode('ascii'))
 
 def ahorcado(jugadores, datos, configuracion):
@@ -256,41 +253,36 @@ def ahorcado(jugadores, datos, configuracion):
         datos1[jugador][7] = []
         datos1[jugador][5] = random_palabra(longitud)
         datos1[jugador][6] = []
-        datos1[jugador][8] = 0
-        datos1[jugador][9].append(datos1[jugador][5])
+        datos1[jugador][8].append(datos1[jugador][5])
         for y in datos1[jugador][5]:
             datos1[jugador][6].append("_")
-    while contador/len(jugadores) != (int(configuracion[2][1])+1):
+    while contador < (int(configuracion[2][1])):
         for jugador in jugadores:
-            if datos1[jugador][8] < 8:
+            mensaje_de_turno(datos1, jugador)
+            letra = ingresar_letra(datos1[jugador][7])
+            if letra not in datos1[jugador][7]:
+                datos1[jugador][7].append(letra)
+            while letra in list(datos1[jugador][5]) and "_" in datos1[jugador][6]:
+                datos1[jugador][4] += int(configuracion[3][1])
+                for z in range(len(datos1[jugador][5])):
+                    if letra == datos1[jugador][5][z]:
+                        datos1[jugador][6][z] = letra
+                if "_" not in datos1[jugador][6]:
+                    print("\n", "Felicidades " + jugador + ", has ganado!", "\n")
+                    ganador = jugador
+                    datos1[jugador][4] += int(configuracion[5][1])
+                    return datos1, ganador
+                if letra in list(datos1[jugador][5]):
+                    datos1[jugador][0] += 1
+                    datos1[jugador][2] += 1
                 mensaje_de_turno(datos1, jugador)
                 letra = ingresar_letra(datos1[jugador][7])
-                datos1[jugador][8] += 1
-                contador += 1
                 if letra not in datos1[jugador][7]:
                     datos1[jugador][7].append(letra)
-                while letra in list(datos1[jugador][5]) and "_" in datos1[jugador][6]:
-                    datos1[jugador][4] += int(configuracion[3][1])
-                    for z in range(len(datos1[jugador][5])):
-                        if letra == datos1[jugador][5][z]:
-                            datos1[jugador][6][z] = letra
-                    if "_" not in datos1[jugador][6]:
-                        print("\n", "Felicidades " + jugador + ", has ganado!", "\n")
-                        ganador = jugador
-                        datos1[jugador][4] += int(configuracion[5][1])
-                        return datos1, ganador
-                    if letra in list(datos1[jugador][5]):
-                        datos1[jugador][0] += 1
-                        datos1[jugador][2] += 1
-                    mensaje_de_turno(datos1, jugador)
-                    letra = ingresar_letra(datos1[jugador][7])
-                    datos1[jugador][8] += 1
-                    contador += 1
-                    if letra not in datos1[jugador][7]:
-                        datos1[jugador][7].append(letra)
-                datos1[jugador][4] -= int(configuracion[3][1])
-                datos1[jugador][1] += 1
-                datos1[jugador][3] += 1
+            datos1[jugador][4] -= int(configuracion[3][1])
+            datos1[jugador][1] += 1
+            datos1[jugador][3] += 1
+        contador += 1
     print("\n", "Ha ganado el programa", "\n")
     ganador = "CPU"
     return datos1, ganador
@@ -300,8 +292,7 @@ def main():
     Funcion principal que junta todos los datos obtenidos y corre el juego. datos[0] son los aciertos de la partida,
     datos[1] son los desaciertos, datos[2] son los aciertos totales, datos[3] son los desaciertos totales,
     datos[4] son los puntos, datos[5] es la palabra a divinar, datos[6] es la palabra a davinar con los guiones bajos,
-    datos[7] son las letras utilizadas, datos[8] es el contador de turnos de el jugador, datos[9] es una lista que
-    contiene las palabras de cada jugador. """
+    datos[7] son las letras utilizadas, datos[8] es una lista que contiene las palabras de cada jugador. """
     print("Bienvenidos al Ahorcado, desarrollado por: ")
     time.sleep(1.0)
     print(''' 
@@ -321,7 +312,14 @@ def main():
     escribirArchivos(arch_1000_noches_y_1_noche, palabras_validas_1000_noches_y_1_noche, configuracion)
     merge(palabras_validas_cuentos, palabras_validas_arania_negra, palabras_validas_1000_noches_y_1_noche,
           arch_palabras)
-    total_palabras(arch_palabras)
+    cantidad_palabras_por_len = total_palabras(arch_palabras)
+    total_de_palabras = 0
+    for key in cantidad_palabras_por_len:
+        total_de_palabras += cantidad_palabras_por_len[key]
+    print("Hay " + str(total_de_palabras) + " palabras en total\n")
+    for item in sorted(cantidad_palabras_por_len.items(), key=lambda x: int(x[0])):
+        print("Hay " + str(item[1]) + " palabras de longitud: " + item[0])
+        time.sleep(0.5)
     time.sleep(1.0)
     jugadores = random_jugadores(configuracion)
     seguir = 1
@@ -329,7 +327,7 @@ def main():
     partidas_jugadas = 0
     datos = {} # Cada jugador tendra una clave asignada al diccionario en donde habra una lista con sus datos
     for jugador in jugadores:
-        datos[jugador] = [0, 0, 0, 0, 0, "", [], [], 0, []]
+        datos[jugador] = [0, 0, 0, 0, 0, "", [], [], []]
     while seguir:
         partidas_jugadas += 1
         datos, ganador = ahorcado(jugadores, datos, configuracion)
