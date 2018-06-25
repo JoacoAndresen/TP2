@@ -103,12 +103,13 @@ def merge(archivo1, archivo2, archivo3, archivo_palabras):
     palabra2 = linea2.rstrip()
     palabra3 = linea3.rstrip()
     while palabra1 != "zzz" or palabra2 != "zzz" or palabra3 != "zzz":
-        palabratxt = arch_palabras
-        leerLineaALinea(palabratxt, "zzz")
         lista = [palabra1, palabra2, palabra3]
         p1 = min(lista)
-        if p1 not in palabratxt:
-            palabratxt.write(p1 + "\n")
+        if p1 not in arch_palabras:
+            if sistemaOperativo() == "Windows":
+                arch_palabras.write(p1 + "\n")
+            else:
+                arch_palabras.write((p1 + "\n").encode('ascii', 'ignore').decode('ascii'))
         if p1 == palabra1:
             linea1 = leerLineaALinea(archivo1, "zzz")
             palabra1 = linea1.rstrip()
