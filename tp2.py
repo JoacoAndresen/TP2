@@ -191,10 +191,11 @@ def random_palabra(longitud):
     """Programada por Joaquín Andresen.
     Utiliza la función random_linea para buscar una linea que contenga una palabra con la longitud recibida,
     luego la devuelve."""
-    palabra = random_linea(arch_palabras).strip()
+    palabra = random_linea(arch_palabras).rstrip()
     while len(palabra) != longitud:
-        palabra = random_linea(arch_palabras).strip()
-    arch_palabras.seek(0)
+        palabra = random_linea(arch_palabras).rstrip()
+        arch_palabras.seek(0)
+    time.sleep(1.0)
     return str(palabra)
 
 def ingresar_letra(utilizadas):
@@ -245,6 +246,10 @@ def ahorcado(jugadores, datos, configuracion):
     time.sleep(1.0)
     print("\nEl orden en que jugaran será:", ', '.join([jugador for jugador in jugadores]))
     longitud = solicitar_longitud()
+    print("Espere mientras el programa obtiene la palabra...")
+    time.sleep(1.0)
+    print("Si la longitud ingresada es muy larga es posible que el proceso tarde más")
+    time.sleep(2.0)
     contador = 0
     datos1 = datos
     arch_palabras.seek(0)
@@ -319,7 +324,8 @@ def main():
         total_de_palabras += cantidad_palabras_por_len[key]
     print("Hay " + str(total_de_palabras) + " palabras en total\n")
     for item in sorted(cantidad_palabras_por_len.items(), key=lambda x: int(x[0])):
-        print("Hay " + str(item[1]) + " palabras de longitud: " + item[0])
+        if int(item[0]) >= 5:
+            print("Hay " + str(item[1]) + " palabras de longitud: " + item[0])
         time.sleep(0.5)
     time.sleep(1.0)
     jugadores = random_jugadores(configuracion)
