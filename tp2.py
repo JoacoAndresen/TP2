@@ -20,13 +20,11 @@ def leer_archivo(archivo):
         linea = archivo.readline()
     return lista
 
-
 def pasarTextoALista(lineaTexto):
     """Programada por Maximiliano Coppolla.
     Recibe una linea de texto y devuelve una lista con las palabras de esa linea."""
     listaPalabras = lineaTexto.split()
     return listaPalabras
-
 
 def es_texto_valido(palabra):
     """Programada por Maximiliano Coppola.
@@ -34,10 +32,9 @@ def es_texto_valido(palabra):
     if palabra == "":
         return False
     for letra in palabra:
-        if letra.lower() not in " aábcdeéfghiíjklmnñoópqrstuúüvwxyz" or letra.isdigit() == True:
+        if letra.lower() not in "aábcdeéfghiíjklmnñoópqrstuúüvwxyz" or letra.isdigit() == True:
             return False
     return True
-
 
 def contar_palabras(lista, configuracion):
     """Programada por Fernando Fabbiano.
@@ -47,7 +44,7 @@ def contar_palabras(lista, configuracion):
         palabras = renglon.split()
         for palabra in palabras:
             palabra = palabra.lower()
-            reemplazar(palabra)
+            palabra = reemplazar(palabra)
             palabra = palabra.upper()
             caract = es_texto_valido(palabra)
             num = any(caract == False for letra in palabra)
@@ -196,6 +193,7 @@ def random_palabra(longitud):
         palabra = random_linea(arch_palabras).rstrip()
         arch_palabras.seek(0)
     time.sleep(1.0)
+    palabra = reemplazar(palabra)
     return str(palabra)
 
 def ingresar_letra(utilizadas):
